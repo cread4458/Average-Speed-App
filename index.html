@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Average Speed</title>
+<style>
+  :root{
+    --bg: #0a0c0e;
+    --bg-elevated: #14171b;
+    --bg-panel: #1a1e23;
+    --border: #262b31;
+    --text-primary: #f2f4f6;
+    --text-secondary: #7c868f;
+    --text-dim: #4a5158;
+    --safe: #35d07f;
+    --safe-dim: #1c4a33;
+    --warn: #f5a623;
+    --warn-dim: #4a3a15;
+    --danger: #ff4d5e;
+    --danger-dim: #4a1c22;
+    --font-mono: ui-monospace, 'SF Mono', 'Roboto Mono', 'Cascadia Mono', monospace;
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body{
+    height: 100%; margin: 0; background: var(--bg); color: var(--text-primary);
+    font-family: var(--font-sans); overscroll-behavior: none; user-select: none;
+  }
+  body{
+    display: flex; flex-direction: column; min-height: 100dvh;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  .topbar{
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+  }
+  .limit-control{ display: flex; align-items: center; gap: 10px; }
+  .limit-label{ font-size: 12px; color: var(--text-secondary); letter-spacing: 0.02em; }
+  .stepper{
+    display: flex; align-items: center; background: var(--bg-panel);
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  }
+  .stepper button{
+    width: 38px; height: 38px; border: none; background: transparent;
+    color: var(--text-primary); font-size: 18px; font-family: var(--font-mono); cursor: pointer;
+  }
+  .stepper button:active{ background: var(--bg-elevated); }
+  .limit-value{
+    font-family: var(--font-mono); font-size: 17px; font-variant-numeric: tabular-nums;
+    min-width: 46px; text-align: center;
+  }
+  .unit-toggle{
+    display: flex; background: var(--bg-panel); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+  }
+  .unit-toggle button{
+    border: none; background: transparent; color: var(--text-secondary);
+    font-family: var(--font-sans); font-size: 13px; padding: 9px 12px; cursor: pointer;
+  }
+  .unit-toggle button.active{ background: var(--bg-elevated); color: var(--text-primary); }
+  .banner{
+    text-align: center; padding: 9px 12px; font-size: 13px; letter-spacing: 0.02em;
+    color: var(--text-secondary); background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border); transition: background 0.25s ease, color 0.25s ease; flex-shrink: 0;
+  }
+  .banner.safe{ background: var(--safe-dim); color: var(--safe); }
+  .banner.warn{ background: var(--warn-dim); color: var(--warn); }
+  .banner.danger{ background: var(--danger-dim); color: var(--danger); animation: pulse 1s ease-in-out infinite; }
+  @keyframes pulse{ 0%, 100%{ opacity: 1; } 50%{ opacity: 0.55; } }
+  .main{
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 4px; padding: 12px;
+  }
+  .current-row{
+    display: flex; align-items: baseline; gap: 6px; font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums; color: var(--text-secondary); font-size: 13px; margin-bottom: 6px;
+  }
+  .current-row .current-label{ font-family: var(--font-sans); letter-spacing: 0.03em; }
+  .current-row .current-value{ font-size: 30px; font-weight: 600; color: var(--text-primary); }
+  .current-row.over .current-value{ color: var(--danger); }
+  .readout-label{ font-size: 13px; color: var(--text-secondary); letter-spacing: 0.03em; }
+  .readout{
+    display: flex; align-items: baseline; gap: 10px; font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums; line-height: 1; transition: color 0.25s ease;
+  }
+  .readout .value{ font-size: min(28vw, 148px); font-weight: 600; color: var(--text-primary); }
+  .readout.safe .value{ color: var(--safe); }
+  .readout.warn .value{ color: var(--warn); }
+  .readout.danger .value{ color: var(--danger); }
+  .readout .unit{ font-size: 22px; color: var(--text-secondary); }
+  .limit-line{
+    font-size: 13px; color: var(--text-dim); font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+  }
+  .stats{ display: flex; justify-content: center; gap: 36px; padding: 6px 12px 18px; flex-shrink: 0; }
+  .stat{ text-align: center; }
+  .stat .num{ font-family: var(--font-mono); font-size: 20px; font-variant-numeric: tabular-nums; }
+  .stat .lbl{ font-size: 11px; color: var(--text-secondary); margin-top: 2px; letter-spacing: 0.02em; }
+  .controls{ padding: 14px 18px calc(18px + env(safe-area-inset-bottom)); flex-shrink: 0; }
+  .reset-btn{
+    width: 100%; height: 76px; border-radius: 18px; border: none; background: var(--safe);
+    color: #06130d; font-family: var(--font-sans); font-size: 20px; font-weight: 700;
+    letter-spacing: 0.02em; cursor: pointer;
+  }
+  .reset-btn:active{ transform: scale(0.98); }
+  .gps-gate{
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 18px; text-align: center; padding: 30px;
+  }
+  .gps-gate p{ color: var(--text-secondary); font-size: 14px; max-width: 300px; line-height: 1.5; margin: 0; }
+  .enable-btn{
+    padding: 16px 32px; border-radius: 14px; border: none; background: var(--safe);
+    color: #06130d; font-family: var(--font-sans); font-size: 16px; font-weight: 700; cursor: pointer;
+  }
+  .accuracy-note{ font-size: 11px; color: var(--text-dim); text-align: center; padding-bottom: 6px; }
+  .hidden{ display: none !important; }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="limit-control">
+      <span class="limit-label">LIMIT</span>
+      <div class="stepper">
+        <button id="limitDown">−</button>
+        <span class="limit-value" id="limitValue">50</span>
+        <button id="limitUp">+</button>
+      </div>
+    </div>
+    <div class="unit-toggle">
+      <button id="unitMph" class="active">mph</button>
+      <button id="unitKph">km/h</button>
+    </div>
+  </div>
+
+  <div class="banner safe" id="banner">Waiting for GPS…</div>
+
+  <div id="gpsGate" class="gps-gate">
+    <p>This needs your location to measure distance and time between resets. It never records or shares your route — everything stays on this screen.</p>
+    <button class="enable-btn" id="enableBtn">Enable GPS &amp; start</button>
+  </div>
+
+  <div id="appBody" class="hidden" style="display:contents">
+    <div class="main">
+      <div class="current-row" id="currentRow">
+        <span class="current-label">NOW</span>
+        <span class="current-value" id="curValue">0</span>
+        <span class="current-unit" id="curUnit">mph</span>
+      </div>
+      <div class="readout-label">AVERAGE SPEED</div>
+      <div class="readout safe" id="readout">
+        <span class="value" id="avgValue">0</span>
+        <span class="unit" id="avgUnit">mph</span>
+      </div>
+      <div class="limit-line" id="limitLine">limit 50 mph</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="num" id="distValue">0.00</div>
+        <div class="lbl" id="distUnit">miles</div>
+      </div>
+      <div class="stat">
+        <div class="num" id="timeValue">0:00</div>
+        <div class="lbl">since reset</div>
+      </div>
+      <div class="stat">
+        <div class="num" id="gpsAccuracy">–</div>
+        <div class="lbl">gps accuracy (m)</div>
+      </div>
+    </div>
+
+    <div class="accuracy-note" id="accuracyNote"></div>
+
+    <div class="controls">
+      <button class="reset-btn" id="resetBtn">RESET</button>
+    </div>
+  </div>
+
+<script>
+(function(){
+  var state = {
+    unit: 'mph',
+    limitMph: 50,
+    totalMeters: 0,
+    startTime: null,
+    lastFix: null,
+    lastRawFix: null,
+    watchId: null,
+    lastBeep: 0,
+    currentSpeedMps: 0,
+  };
+
+  var els = {
+    banner: document.getElementById('banner'),
+    gpsGate: document.getElementById('gpsGate'),
+    appBody: document.getElementById('appBody'),
+    enableBtn: document.getElementById('enableBtn'),
+    readout: document.getElementById('readout'),
+    currentRow: document.getElementById('currentRow'),
+    curValue: document.getElementById('curValue'),
+    curUnit: document.getElementById('curUnit'),
+    avgValue: document.getElementById('avgValue'),
+    avgUnit: document.getElementById('avgUnit'),
+    limitLine: document.getElementById('limitLine'),
+    limitValue: document.getElementById('limitValue'),
+    limitDown: document.getElementById('limitDown'),
+    limitUp: document.getElementById('limitUp'),
+    unitMph: document.getElementById('unitMph'),
+    unitKph: document.getElementById('unitKph'),
+    distValue: document.getElementById('distValue'),
+    distUnit: document.getElementById('distUnit'),
+    timeValue: document.getElementById('timeValue'),
+    gpsAccuracy: document.getElementById('gpsAccuracy'),
+    accuracyNote: document.getElementById('accuracyNote'),
+    resetBtn: document.getElementById('resetBtn'),
+  };
+
+  var MPH_PER_MPS = 2.236936;
+  var MILES_PER_METER = 0.000621371;
+  var KM_PER_METER = 0.001;
+
+  function haversineMeters(lat1, lon1, lat2, lon2){
+    var R = 6371000;
+    var toRad = function(d){ return d * Math.PI / 180; };
+    var dLat = toRad(lat2 - lat1);
+    var dLon = toRad(lon2 - lon1);
+    var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }
+
+  function resetTrip(){
+    state.totalMeters = 0;
+    state.startTime = performance.now();
+    state.lastFix = null;
+    render(0, 0, 0);
+    setState('safe', 'On the clock');
+  }
+
+  function setState(level, msg){
+    els.banner.className = 'banner ' + level;
+    els.banner.textContent = msg;
+    els.readout.className = 'readout ' + level;
+  }
+
+  function beepAndBuzz(){
+    var now = Date.now();
+    if(now - state.lastBeep < 4000) return;
+    state.lastBeep = now;
+    try{
+      var ctx = new (window.AudioContext || window.webkitAudioContext)();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.value = 880;
+      gain.gain.value = 0.15;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.18);
+    }catch(e){}
+    if(navigator.vibrate) navigator.vibrate([120, 60, 120]);
+  }
+
+  function limitInCurrentUnit(){
+    return state.unit === 'mph' ? state.limitMph : state.limitMph * 1.609344;
+  }
+
+  function renderCurrentSpeed(){
+    var mps = state.currentSpeedMps || 0;
+    var val = state.unit === 'mph' ? mps * MPH_PER_MPS : mps * 3.6;
+    els.curValue.textContent = val.toFixed(0);
+    els.curUnit.textContent = state.unit === 'mph' ? 'mph' : 'km/h';
+    if(val > limitInCurrentUnit()){
+      els.currentRow.classList.add('over');
+    } else {
+      els.currentRow.classList.remove('over');
+    }
+  }
+
+  function render(avgSpeedMps, distMeters, elapsedSec){
+    var avgDisplay, limitDisplay, distDisplay;
+    if(state.unit === 'mph'){
+      avgDisplay = avgSpeedMps * MPH_PER_MPS;
+      limitDisplay = state.limitMph;
+      distDisplay = distMeters * MILES_PER_METER;
+      els.avgUnit.textContent = 'mph';
+      els.distUnit.textContent = 'miles';
+    } else {
+      avgDisplay = avgSpeedMps * 3.6;
+      limitDisplay = state.limitMph * 1.609344;
+      distDisplay = distMeters * KM_PER_METER;
+      els.avgUnit.textContent = 'km/h';
+      els.distUnit.textContent = 'km';
+    }
+
+    els.avgValue.textContent = avgDisplay.toFixed(0);
+    els.limitLine.textContent = 'limit ' + limitDisplay.toFixed(0) + ' ' + (state.unit === 'mph' ? 'mph' : 'km/h');
+    els.distValue.textContent = distDisplay.toFixed(2);
+
+    var mins = Math.floor(elapsedSec / 60);
+    var secs = Math.floor(elapsedSec % 60);
+    els.timeValue.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+
+    var ratio = limitDisplay > 0 ? avgDisplay / limitDisplay : 0;
+    if(elapsedSec < 3){
+      setState('safe', 'On the clock');
+    } else if(ratio >= 1){
+      setState('danger', 'Over average limit — ease off');
+      beepAndBuzz();
+    } else if(ratio >= 0.92){
+      setState('warn', 'Close to the limit');
+    } else {
+      setState('safe', 'Under limit');
+    }
+  }
+
+  function tick(){
+    if(state.startTime == null) return;
+    var elapsedSec = (performance.now() - state.startTime) / 1000;
+    var avgSpeed = elapsedSec > 0 ? state.totalMeters / elapsedSec : 0;
+    render(avgSpeed, state.totalMeters, elapsedSec);
+  }
+
+  function onPosition(pos){
+    var c = pos.coords;
+    els.gpsAccuracy.textContent = c.accuracy ? c.accuracy.toFixed(0) : '–';
+
+    if(c.accuracy && c.accuracy > 40){
+      els.accuracyNote.textContent = 'Weak GPS signal — average may be less accurate right now.';
+    } else {
+      els.accuracyNote.textContent = '';
+    }
+
+    var now = performance.now();
+
+    var instSpeedMps = (typeof c.speed === 'number' && c.speed >= 0 && isFinite(c.speed)) ? c.speed : null;
+
+    if(instSpeedMps === null && state.lastRawFix){
+      var dtRaw = (now - state.lastRawFix.t) / 1000;
+      if(dtRaw > 0.25){
+        var dRaw = haversineMeters(state.lastRawFix.lat, state.lastRawFix.lon, c.latitude, c.longitude);
+        var derived = dRaw / dtRaw;
+        if(derived <= 112){
+          instSpeedMps = derived;
+        }
+      }
+    }
+    state.lastRawFix = { lat: c.latitude, lon: c.longitude, t: now };
+
+    if(instSpeedMps !== null){
+      state.currentSpeedMps = (state.currentSpeedMps == null)
+        ? instSpeedMps
+        : state.currentSpeedMps * 0.35 + instSpeedMps * 0.65;
+      renderCurrentSpeed();
+    }
+
+    if(state.lastFix && c.accuracy && c.accuracy <= 40){
+      var d = haversineMeters(state.lastFix.lat, state.lastFix.lon, c.latitude, c.longitude);
+      if(d > 1.5){
+        state.totalMeters += d;
+      }
+    }
+    if(!c.accuracy || c.accuracy <= 40){
+      state.lastFix = { lat: c.latitude, lon: c.longitude, t: now };
+    }
+    tick();
+  }
+
+  function onPositionError(err){
+    setState('warn', 'GPS signal lost — ' + (err.message || 'retrying'));
+  }
+
+  function startGps(){
+    if(!navigator.geolocation){
+      setState('danger', 'GPS not available on this device/browser');
+      return;
+    }
+    els.gpsGate.classList.add('hidden');
+    els.appBody.classList.remove('hidden');
+    resetTrip();
+    state.watchId = navigator.geolocation.watchPosition(onPosition, onPositionError, {
+      enableHighAccuracy: true,
+      maximumAge: 1000,
+      timeout: 10000
+    });
+    setInterval(tick, 1000);
+  }
+
+  els.enableBtn.addEventListener('click', startGps);
+  els.resetBtn.addEventListener('click', resetTrip);
+
+  els.limitDown.addEventListener('click', function(){
+    state.limitMph = Math.max(10, state.limitMph - 5);
+    els.limitValue.textContent = state.limitMph;
+    tick();
+    renderCurrentSpeed();
+  });
+  els.limitUp.addEventListener('click', function(){
+    state.limitMph = Math.min(120, state.limitMph + 5);
+    els.limitValue.textContent = state.limitMph;
+    tick();
+    renderCurrentSpeed();
+  });
+
+  els.unitMph.addEventListener('click', function(){
+    state.unit = 'mph';
+    els.unitMph.classList.add('active');
+    els.unitKph.classList.remove('active');
+    tick();
+    renderCurrentSpeed();
+  });
+  els.unitKph.addEventListener('click', function(){
+    state.unit = 'kph';
+    els.unitKph.classList.add('active');
+    els.unitMph.classList.remove('active');
+    tick();
+    renderCurrentSpeed();
+  });
+})();
+</script>
+</body>
+</html>
