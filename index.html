@@ -22,21 +22,38 @@
     --font-mono: ui-monospace, 'SF Mono', 'Roboto Mono', 'Cascadia Mono', monospace;
     --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
+
   *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
   html, body{
-    height: 100%; margin: 0; background: var(--bg); color: var(--text-primary);
-    font-family: var(--font-sans); overscroll-behavior: none; user-select: none;
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    overscroll-behavior: none;
+    user-select: none;
   }
+
   body{
-    display: flex; flex-direction: column; min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
+
   .topbar{
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 18px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
   }
+
   .limit-control{ display: flex; align-items: center; gap: 10px; }
   .limit-label{ font-size: 12px; color: var(--text-secondary); letter-spacing: 0.02em; }
+
   .stepper{
     display: flex; align-items: center; background: var(--bg-panel);
     border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
@@ -46,10 +63,12 @@
     color: var(--text-primary); font-size: 18px; font-family: var(--font-mono); cursor: pointer;
   }
   .stepper button:active{ background: var(--bg-elevated); }
+
   .limit-value{
     font-family: var(--font-mono); font-size: 17px; font-variant-numeric: tabular-nums;
     min-width: 46px; text-align: center;
   }
+
   .unit-toggle{
     display: flex; background: var(--bg-panel); border: 1px solid var(--border);
     border-radius: 10px; overflow: hidden;
@@ -59,43 +78,101 @@
     font-family: var(--font-sans); font-size: 13px; padding: 9px 12px; cursor: pointer;
   }
   .unit-toggle button.active{ background: var(--bg-elevated); color: var(--text-primary); }
+
   .banner{
-    text-align: center; padding: 9px 12px; font-size: 13px; letter-spacing: 0.02em;
-    color: var(--text-secondary); background: var(--bg-elevated);
-    border-bottom: 1px solid var(--border); transition: background 0.25s ease, color 0.25s ease; flex-shrink: 0;
+    text-align: center;
+    padding: 16px 14px;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    color: var(--text-secondary);
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.25s ease, color 0.25s ease;
+    flex-shrink: 0;
   }
   .banner.safe{ background: var(--safe-dim); color: var(--safe); }
   .banner.warn{ background: var(--warn-dim); color: var(--warn); }
-  .banner.danger{ background: var(--danger-dim); color: var(--danger); animation: pulse 1s ease-in-out infinite; }
-  @keyframes pulse{ 0%, 100%{ opacity: 1; } 50%{ opacity: 0.55; } }
+  .banner.danger{
+    background: var(--danger);
+    color: #1a0407;
+    animation: pulse 0.8s ease-in-out infinite;
+  }
+
+  @keyframes pulse{
+    0%, 100%{ opacity: 1; }
+    50%{ opacity: 0.55; }
+  }
+
   .main{
     flex: 1; display: flex; flex-direction: column; align-items: center;
     justify-content: center; gap: 4px; padding: 12px;
   }
-  .current-row{
-    display: flex; align-items: baseline; gap: 6px; font-family: var(--font-mono);
-    font-variant-numeric: tabular-nums; color: var(--text-secondary); font-size: 13px; margin-bottom: 6px;
+
+  .dash-row{
+    display: flex; align-items: center; justify-content: center; gap: 22px; margin-bottom: 18px;
   }
-  .current-row .current-label{ font-family: var(--font-sans); letter-spacing: 0.03em; }
-  .current-row .current-value{ font-size: 30px; font-weight: 600; color: var(--text-primary); }
-  .current-row.over .current-value{ color: var(--danger); }
+
+  .speed-circle{
+    width: min(36vw, 158px);
+    height: min(36vw, 158px);
+    border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    line-height: 1;
+  }
+
+  .speed-circle.now{
+    background: var(--bg-panel);
+    border: 7px solid var(--border);
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+  .speed-circle.now.safe{ border-color: var(--safe); }
+  .speed-circle.now.warn{ border-color: var(--warn); }
+  .speed-circle.now.danger{
+    border-color: var(--danger);
+    background: var(--danger-dim);
+    animation: pulse 0.8s ease-in-out infinite;
+  }
+  .speed-circle.now .circle-value{
+    font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+    font-size: min(12vw, 54px); font-weight: 700; color: var(--text-primary);
+  }
+  .speed-circle.now .circle-unit{ font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .speed-circle.now .circle-label{
+    font-family: var(--font-sans); font-size: 11px; letter-spacing: 0.05em;
+    color: var(--text-secondary); margin-top: 3px;
+  }
+
+  .speed-circle.limit-sign{
+    background: #ffffff;
+    border: 10px solid #d31b23;
+    box-shadow: inset 0 0 0 2px #ffffff, 0 2px 10px rgba(0,0,0,0.4);
+  }
+  .speed-circle.limit-sign .sign-value{
+    font-family: var(--font-sans); font-size: min(14vw, 62px); font-weight: 800; color: #16181a;
+  }
+
   .readout-label{ font-size: 13px; color: var(--text-secondary); letter-spacing: 0.03em; }
+
   .readout{
     display: flex; align-items: baseline; gap: 10px; font-family: var(--font-mono);
     font-variant-numeric: tabular-nums; line-height: 1; transition: color 0.25s ease;
   }
-  .readout .value{ font-size: min(28vw, 148px); font-weight: 600; color: var(--text-primary); }
+  .readout .value{ font-size: min(22vw, 120px); font-weight: 600; color: var(--text-primary); }
   .readout.safe .value{ color: var(--safe); }
   .readout.warn .value{ color: var(--warn); }
   .readout.danger .value{ color: var(--danger); }
   .readout .unit{ font-size: 22px; color: var(--text-secondary); }
+
   .limit-line{
     font-size: 13px; color: var(--text-dim); font-family: var(--font-mono); font-variant-numeric: tabular-nums;
   }
+
   .stats{ display: flex; justify-content: center; gap: 36px; padding: 6px 12px 18px; flex-shrink: 0; }
   .stat{ text-align: center; }
   .stat .num{ font-family: var(--font-mono); font-size: 20px; font-variant-numeric: tabular-nums; }
   .stat .lbl{ font-size: 11px; color: var(--text-secondary); margin-top: 2px; letter-spacing: 0.02em; }
+
   .controls{ padding: 14px 18px calc(18px + env(safe-area-inset-bottom)); flex-shrink: 0; }
   .reset-btn{
     width: 100%; height: 76px; border-radius: 18px; border: none; background: var(--safe);
@@ -103,6 +180,7 @@
     letter-spacing: 0.02em; cursor: pointer;
   }
   .reset-btn:active{ transform: scale(0.98); }
+
   .gps-gate{
     flex: 1; display: flex; flex-direction: column; align-items: center;
     justify-content: center; gap: 18px; text-align: center; padding: 30px;
@@ -142,11 +220,17 @@
 
   <div id="appBody" class="hidden" style="display:contents">
     <div class="main">
-      <div class="current-row" id="currentRow">
-        <span class="current-label">NOW</span>
-        <span class="current-value" id="curValue">0</span>
-        <span class="current-unit" id="curUnit">mph</span>
+      <div class="dash-row">
+        <div class="speed-circle now safe" id="nowCircle">
+          <div class="circle-value" id="curValue">0</div>
+          <div class="circle-unit" id="curUnit">mph</div>
+          <div class="circle-label">NOW</div>
+        </div>
+        <div class="speed-circle limit-sign">
+          <div class="sign-value" id="limitSignValue">50</div>
+        </div>
       </div>
+
       <div class="readout-label">AVERAGE SPEED</div>
       <div class="readout safe" id="readout">
         <span class="value" id="avgValue">0</span>
@@ -197,9 +281,10 @@
     appBody: document.getElementById('appBody'),
     enableBtn: document.getElementById('enableBtn'),
     readout: document.getElementById('readout'),
-    currentRow: document.getElementById('currentRow'),
+    nowCircle: document.getElementById('nowCircle'),
     curValue: document.getElementById('curValue'),
     curUnit: document.getElementById('curUnit'),
+    limitSignValue: document.getElementById('limitSignValue'),
     avgValue: document.getElementById('avgValue'),
     avgUnit: document.getElementById('avgUnit'),
     limitLine: document.getElementById('limitLine'),
@@ -274,11 +359,10 @@
     var val = state.unit === 'mph' ? mps * MPH_PER_MPS : mps * 3.6;
     els.curValue.textContent = val.toFixed(0);
     els.curUnit.textContent = state.unit === 'mph' ? 'mph' : 'km/h';
-    if(val > limitInCurrentUnit()){
-      els.currentRow.classList.add('over');
-    } else {
-      els.currentRow.classList.remove('over');
-    }
+    var limitDisplay = limitInCurrentUnit();
+    var ratio = limitDisplay > 0 ? val / limitDisplay : 0;
+    var level = ratio >= 1 ? 'danger' : (ratio >= 0.92 ? 'warn' : 'safe');
+    els.nowCircle.className = 'speed-circle now ' + level;
   }
 
   function render(avgSpeedMps, distMeters, elapsedSec){
@@ -299,6 +383,7 @@
 
     els.avgValue.textContent = avgDisplay.toFixed(0);
     els.limitLine.textContent = 'limit ' + limitDisplay.toFixed(0) + ' ' + (state.unit === 'mph' ? 'mph' : 'km/h');
+    els.limitSignValue.textContent = limitDisplay.toFixed(0);
     els.distValue.textContent = distDisplay.toFixed(2);
 
     var mins = Math.floor(elapsedSec / 60);
@@ -309,10 +394,10 @@
     if(elapsedSec < 3){
       setState('safe', 'On the clock');
     } else if(ratio >= 1){
-      setState('danger', 'Over average limit — ease off');
+      setState('danger', '⚠ OVER AVERAGE LIMIT — EASE OFF');
       beepAndBuzz();
     } else if(ratio >= 0.92){
-      setState('warn', 'Close to the limit');
+      setState('warn', '⚠ Close to the limit');
     } else {
       setState('safe', 'Under limit');
     }
@@ -339,7 +424,7 @@
 
     var instSpeedMps = (typeof c.speed === 'number' && c.speed >= 0 && isFinite(c.speed)) ? c.speed : null;
 
-    if(instSpeedMps === null && state.lastRawFix){
+    if(instSpeedMps === null && state.lastRawFix && c.accuracy && c.accuracy <= 30){
       var dtRaw = (now - state.lastRawFix.t) / 1000;
       if(dtRaw > 0.25){
         var dRaw = haversineMeters(state.lastRawFix.lat, state.lastRawFix.lon, c.latitude, c.longitude);
