@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -265,7 +266,7 @@
 (function(){
   var state = {
     unit: 'mph',
-    limitMph: 50,
+    limit: 50,
     totalMeters: 0,
     startTime: null,
     lastFix: null,
@@ -351,7 +352,7 @@
   }
 
   function limitInCurrentUnit(){
-    return state.unit === 'mph' ? state.limitMph : state.limitMph * 1.609344;
+    return state.limit;
   }
 
   function renderCurrentSpeed(){
@@ -366,16 +367,15 @@
   }
 
   function render(avgSpeedMps, distMeters, elapsedSec){
-    var avgDisplay, limitDisplay, distDisplay;
+    var avgDisplay, distDisplay;
+    var limitDisplay = state.limit;
     if(state.unit === 'mph'){
       avgDisplay = avgSpeedMps * MPH_PER_MPS;
-      limitDisplay = state.limitMph;
       distDisplay = distMeters * MILES_PER_METER;
       els.avgUnit.textContent = 'mph';
       els.distUnit.textContent = 'miles';
     } else {
       avgDisplay = avgSpeedMps * 3.6;
-      limitDisplay = state.limitMph * 1.609344;
       distDisplay = distMeters * KM_PER_METER;
       els.avgUnit.textContent = 'km/h';
       els.distUnit.textContent = 'km';
@@ -479,29 +479,39 @@
   els.resetBtn.addEventListener('click', resetTrip);
 
   els.limitDown.addEventListener('click', function(){
-    state.limitMph = Math.max(10, state.limitMph - 5);
-    els.limitValue.textContent = state.limitMph;
+    var minV = state.unit === 'mph' ? 10 : 15;
+    state.limit = Math.max(minV, state.limit - 5);
+    els.limitValue.textContent = state.limit;
     tick();
     renderCurrentSpeed();
   });
   els.limitUp.addEventListener('click', function(){
-    state.limitMph = Math.min(120, state.limitMph + 5);
-    els.limitValue.textContent = state.limitMph;
+    var maxV = state.unit === 'mph' ? 120 : 195;
+    state.limit = Math.min(maxV, state.limit + 5);
+    els.limitValue.textContent = state.limit;
     tick();
     renderCurrentSpeed();
   });
 
   els.unitMph.addEventListener('click', function(){
+    if(state.unit !== 'mph'){
+      state.limit = Math.round(state.limit / 1.609344 / 5) * 5;
+    }
     state.unit = 'mph';
     els.unitMph.classList.add('active');
     els.unitKph.classList.remove('active');
+    els.limitValue.textContent = state.limit;
     tick();
     renderCurrentSpeed();
   });
   els.unitKph.addEventListener('click', function(){
+    if(state.unit !== 'kph'){
+      state.limit = Math.round(state.limit * 1.609344 / 5) * 5;
+    }
     state.unit = 'kph';
     els.unitKph.classList.add('active');
     els.unitMph.classList.remove('active');
+    els.limitValue.textContent = state.limit;
     tick();
     renderCurrentSpeed();
   });
