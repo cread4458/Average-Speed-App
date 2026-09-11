@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,33 +51,84 @@
     flex-shrink: 0;
   }
 
-  .limit-control{ display: flex; align-items: center; gap: 10px; }
-  .limit-label{ font-size: 12px; color: var(--text-secondary); letter-spacing: 0.02em; }
+  .limit-control{
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
 
-  .stepper{
-    display: flex; align-items: center; background: var(--bg-panel);
-    border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  .limit-label{
+    font-size: 12px;
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
   }
-  .stepper button{
-    width: 38px; height: 38px; border: none; background: transparent;
-    color: var(--text-primary); font-size: 18px; font-family: var(--font-mono); cursor: pointer;
-  }
-  .stepper button:active{ background: var(--bg-elevated); }
 
   .limit-value{
-    font-family: var(--font-mono); font-size: 17px; font-variant-numeric: tabular-nums;
-    min-width: 46px; text-align: center;
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
   }
 
-  .unit-toggle{
-    display: flex; background: var(--bg-panel); border: 1px solid var(--border);
-    border-radius: 10px; overflow: hidden;
+  .limit-value-unit{
+    font-size: 12px;
+    color: var(--text-secondary);
   }
-  .unit-toggle button{
-    border: none; background: transparent; color: var(--text-secondary);
-    font-family: var(--font-sans); font-size: 13px; padding: 9px 12px; cursor: pointer;
+
+  .preset-bar{
+    padding: 10px 18px 12px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
   }
-  .unit-toggle button.active{ background: var(--bg-elevated); color: var(--text-primary); }
+
+  .preset-caption{
+    display: block;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .preset-row{
+    display: flex;
+    gap: 8px;
+  }
+
+  .preset-btn{
+    flex: 1;
+    padding: 10px 0;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-panel);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 17px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+  }
+
+  .preset-btn.active{
+    background: var(--safe);
+    border-color: var(--safe);
+    color: #06130d;
+  }
+
+  .topbar-actions{
+    display: flex;
+    gap: 8px;
+  }
+
+  .icon-btn{
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-secondary);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    padding: 9px 12px;
+    cursor: pointer;
+  }
 
   .banner{
     text-align: center;
@@ -92,6 +142,7 @@
     transition: background 0.25s ease, color 0.25s ease;
     flex-shrink: 0;
   }
+
   .banner.safe{ background: var(--safe-dim); color: var(--safe); }
   .banner.warn{ background: var(--warn-dim); color: var(--warn); }
   .banner.danger{
@@ -106,19 +157,31 @@
   }
 
   .main{
-    flex: 1; display: flex; flex-direction: column; align-items: center;
-    justify-content: center; gap: 4px; padding: 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 12px;
   }
 
   .dash-row{
-    display: flex; align-items: center; justify-content: center; gap: 22px; margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    margin-bottom: 18px;
   }
 
   .speed-circle{
     width: min(36vw, 158px);
     height: min(36vw, 158px);
     border-radius: 50%;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     line-height: 1;
   }
 
@@ -127,6 +190,7 @@
     border: 7px solid var(--border);
     transition: border-color 0.2s ease, background-color 0.2s ease;
   }
+
   .speed-circle.now.safe{ border-color: var(--safe); }
   .speed-circle.now.warn{ border-color: var(--warn); }
   .speed-circle.now.danger{
@@ -134,14 +198,27 @@
     background: var(--danger-dim);
     animation: pulse 0.8s ease-in-out infinite;
   }
+
   .speed-circle.now .circle-value{
-    font-family: var(--font-mono); font-variant-numeric: tabular-nums;
-    font-size: min(12vw, 54px); font-weight: 700; color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: min(12vw, 54px);
+    font-weight: 700;
+    color: var(--text-primary);
   }
-  .speed-circle.now .circle-unit{ font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+  .speed-circle.now .circle-unit{
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+  }
+
   .speed-circle.now .circle-label{
-    font-family: var(--font-sans); font-size: 11px; letter-spacing: 0.05em;
-    color: var(--text-secondary); margin-top: 3px;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    margin-top: 3px;
   }
 
   .speed-circle.limit-sign{
@@ -149,50 +226,250 @@
     border: 10px solid #d31b23;
     box-shadow: inset 0 0 0 2px #ffffff, 0 2px 10px rgba(0,0,0,0.4);
   }
+
   .speed-circle.limit-sign .sign-value{
-    font-family: var(--font-sans); font-size: min(14vw, 62px); font-weight: 800; color: #16181a;
+    font-family: var(--font-sans);
+    font-size: min(14vw, 62px);
+    font-weight: 800;
+    color: #16181a;
   }
 
-  .readout-label{ font-size: 13px; color: var(--text-secondary); letter-spacing: 0.03em; }
+  /* National Speed Limit sign: white circle, black diagonal band, no number */
+  .speed-circle.limit-sign.nsl{
+    border-color: #16181a;
+    border-width: 4px;
+    background: linear-gradient(135deg,
+      transparent calc(50% - 9px),
+      #16181a calc(50% - 9px),
+      #16181a calc(50% + 9px),
+      transparent calc(50% + 9px)
+    ), #ffffff;
+  }
+
+  .speed-circle.limit-sign.nsl .sign-value{
+    display: none;
+  }
+
+  .readout-label{
+    font-size: 13px;
+    color: var(--text-secondary);
+    letter-spacing: 0.03em;
+  }
 
   .readout{
-    display: flex; align-items: baseline; gap: 10px; font-family: var(--font-mono);
-    font-variant-numeric: tabular-nums; line-height: 1; transition: color 0.25s ease;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    transition: color 0.25s ease;
   }
-  .readout .value{ font-size: min(22vw, 120px); font-weight: 600; color: var(--text-primary); }
+
+  .readout .value{
+    font-size: min(22vw, 120px);
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
   .readout.safe .value{ color: var(--safe); }
   .readout.warn .value{ color: var(--warn); }
   .readout.danger .value{ color: var(--danger); }
-  .readout .unit{ font-size: 22px; color: var(--text-secondary); }
+
+  .readout .unit{
+    font-size: 22px;
+    color: var(--text-secondary);
+  }
 
   .limit-line{
-    font-size: 13px; color: var(--text-dim); font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+    font-size: 13px;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
   }
 
-  .stats{ display: flex; justify-content: center; gap: 36px; padding: 6px 12px 18px; flex-shrink: 0; }
-  .stat{ text-align: center; }
-  .stat .num{ font-family: var(--font-mono); font-size: 20px; font-variant-numeric: tabular-nums; }
-  .stat .lbl{ font-size: 11px; color: var(--text-secondary); margin-top: 2px; letter-spacing: 0.02em; }
+  .stats{
+    display: flex;
+    justify-content: center;
+    gap: 36px;
+    padding: 6px 12px 18px;
+    flex-shrink: 0;
+  }
 
-  .controls{ padding: 14px 18px calc(18px + env(safe-area-inset-bottom)); flex-shrink: 0; }
+  .stat{
+    text-align: center;
+  }
+
+  .stat .num{
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat .lbl{
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+    letter-spacing: 0.02em;
+  }
+
+  .controls{
+    padding: 14px 18px calc(18px + env(safe-area-inset-bottom));
+    flex-shrink: 0;
+  }
+
   .reset-btn{
-    width: 100%; height: 76px; border-radius: 18px; border: none; background: var(--safe);
-    color: #06130d; font-family: var(--font-sans); font-size: 20px; font-weight: 700;
-    letter-spacing: 0.02em; cursor: pointer;
+    width: 100%;
+    height: 76px;
+    border-radius: 18px;
+    border: none;
+    background: var(--safe);
+    color: #06130d;
+    font-family: var(--font-sans);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
   }
+
   .reset-btn:active{ transform: scale(0.98); }
 
   .gps-gate{
-    flex: 1; display: flex; flex-direction: column; align-items: center;
-    justify-content: center; gap: 18px; text-align: center; padding: 30px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    text-align: center;
+    padding: 30px;
   }
-  .gps-gate p{ color: var(--text-secondary); font-size: 14px; max-width: 300px; line-height: 1.5; margin: 0; }
+
+  .gps-gate p{
+    color: var(--text-secondary);
+    font-size: 14px;
+    max-width: 300px;
+    line-height: 1.5;
+    margin: 0;
+  }
+
   .enable-btn{
-    padding: 16px 32px; border-radius: 14px; border: none; background: var(--safe);
-    color: #06130d; font-family: var(--font-sans); font-size: 16px; font-weight: 700; cursor: pointer;
+    padding: 16px 32px;
+    border-radius: 14px;
+    border: none;
+    background: var(--safe);
+    color: #06130d;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
   }
-  .accuracy-note{ font-size: 11px; color: var(--text-dim); text-align: center; padding-bottom: 6px; }
+
+  .accuracy-note{
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: center;
+    padding-bottom: 6px;
+  }
+
   .hidden{ display: none !important; }
+
+  .history-overlay{
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  .history-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .history-close{
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    width: 34px;
+    height: 34px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .history-list{
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 18px;
+  }
+
+  .history-empty{
+    color: var(--text-secondary);
+    font-size: 14px;
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .history-item{
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+
+  .history-item-top{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .history-date{
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .history-badge{
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+
+  .history-badge.ok{ background: var(--safe-dim); color: var(--safe); }
+  .history-badge.over{ background: var(--danger-dim); color: var(--danger); }
+
+  .history-item-stats{
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 14px;
+    color: var(--text-primary);
+  }
+
+  .history-clear-btn{
+    margin: 8px 18px calc(14px + env(safe-area-inset-bottom));
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid var(--danger-dim);
+    background: transparent;
+    color: var(--danger);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
 </style>
 </head>
 <body>
@@ -200,15 +477,24 @@
   <div class="topbar">
     <div class="limit-control">
       <span class="limit-label">LIMIT</span>
-      <div class="stepper">
-        <button id="limitDown">−</button>
-        <span class="limit-value" id="limitValue">50</span>
-        <button id="limitUp">+</button>
-      </div>
+      <span class="limit-value" id="limitValue">50</span>
+      <span class="limit-value-unit">mph</span>
     </div>
-    <div class="unit-toggle">
-      <button id="unitMph" class="active">mph</button>
-      <button id="unitKph">km/h</button>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="voiceToggle" aria-label="Toggle voice alerts">🔊</button>
+      <button class="icon-btn" id="historyBtn" aria-label="Trip history">History</button>
+    </div>
+  </div>
+
+  <div class="preset-bar">
+    <span class="preset-caption">UK LIMIT (mph)</span>
+    <div class="preset-row" id="presetRow">
+      <button class="preset-btn" data-mph="20">20</button>
+      <button class="preset-btn" data-mph="30">30</button>
+      <button class="preset-btn" data-mph="40">40</button>
+      <button class="preset-btn active" data-mph="50">50</button>
+      <button class="preset-btn" data-mph="60">60</button>
+      <button class="preset-btn" data-mph="70">70</button>
     </div>
   </div>
 
@@ -224,10 +510,10 @@
       <div class="dash-row">
         <div class="speed-circle now safe" id="nowCircle">
           <div class="circle-value" id="curValue">0</div>
-          <div class="circle-unit" id="curUnit">mph</div>
+          <div class="circle-unit">mph</div>
           <div class="circle-label">NOW</div>
         </div>
-        <div class="speed-circle limit-sign">
+        <div class="speed-circle limit-sign" id="limitSignCircle">
           <div class="sign-value" id="limitSignValue">50</div>
         </div>
       </div>
@@ -235,7 +521,7 @@
       <div class="readout-label">AVERAGE SPEED</div>
       <div class="readout safe" id="readout">
         <span class="value" id="avgValue">0</span>
-        <span class="unit" id="avgUnit">mph</span>
+        <span class="unit">mph</span>
       </div>
       <div class="limit-line" id="limitLine">limit 50 mph</div>
     </div>
@@ -262,17 +548,28 @@
     </div>
   </div>
 
+  <div id="historyOverlay" class="history-overlay hidden">
+    <div class="history-header">
+      <span>Trip History</span>
+      <button class="history-close" id="historyClose">✕</button>
+    </div>
+    <div class="history-list" id="historyList"></div>
+    <button class="history-clear-btn" id="historyClear">Clear history</button>
+  </div>
+
 <script>
 (function(){
   var state = {
-    unit: 'mph',
-    limit: 50,
+    limitMph: 50,            // always a real UK sign value: 20/30/40/50/60/70
     totalMeters: 0,
     startTime: null,
-    lastFix: null,
-    lastRawFix: null,
+    lastFix: null,          // {lat, lon, accuracy, t} — accuracy-gated, feeds the average
+    lastRawFix: null,       // {lat, lon, t} — every fix, feeds current speed
     watchId: null,
     lastBeep: 0,
+    lastVoice: {},          // cooldown timestamps keyed by 'warn' / 'danger'
+    voiceOn: true,
+    tripWentOver: false,
     currentSpeedMps: 0,
   };
 
@@ -284,16 +581,18 @@
     readout: document.getElementById('readout'),
     nowCircle: document.getElementById('nowCircle'),
     curValue: document.getElementById('curValue'),
-    curUnit: document.getElementById('curUnit'),
     limitSignValue: document.getElementById('limitSignValue'),
+    limitSignCircle: document.getElementById('limitSignCircle'),
     avgValue: document.getElementById('avgValue'),
-    avgUnit: document.getElementById('avgUnit'),
     limitLine: document.getElementById('limitLine'),
     limitValue: document.getElementById('limitValue'),
-    limitDown: document.getElementById('limitDown'),
-    limitUp: document.getElementById('limitUp'),
-    unitMph: document.getElementById('unitMph'),
-    unitKph: document.getElementById('unitKph'),
+    presetBtns: document.querySelectorAll('.preset-btn'),
+    voiceToggle: document.getElementById('voiceToggle'),
+    historyBtn: document.getElementById('historyBtn'),
+    historyOverlay: document.getElementById('historyOverlay'),
+    historyClose: document.getElementById('historyClose'),
+    historyClear: document.getElementById('historyClear'),
+    historyList: document.getElementById('historyList'),
     distValue: document.getElementById('distValue'),
     distUnit: document.getElementById('distUnit'),
     timeValue: document.getElementById('timeValue'),
@@ -304,7 +603,6 @@
 
   var MPH_PER_MPS = 2.236936;
   var MILES_PER_METER = 0.000621371;
-  var KM_PER_METER = 0.001;
 
   function haversineMeters(lat1, lon1, lat2, lon2){
     var R = 6371000;
@@ -318,10 +616,71 @@
     return R * c;
   }
 
+  function loadHistory(){
+    try{
+      return JSON.parse(localStorage.getItem('specsHistory') || '[]');
+    }catch(e){
+      return [];
+    }
+  }
+
+  function saveHistory(arr){
+    try{
+      localStorage.setItem('specsHistory', JSON.stringify(arr.slice(0, 50)));
+    }catch(e){}
+  }
+
+  function logTrip(record){
+    var h = loadHistory();
+    h.unshift(record);
+    saveHistory(h);
+  }
+
+  function formatTs(ts){
+    var d = new Date(ts);
+    return d.toLocaleDateString([], { day: '2-digit', month: 'short' }) + ' · ' +
+      d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function renderHistory(){
+    var h = loadHistory();
+    if(h.length === 0){
+      els.historyList.innerHTML = '<div class="history-empty">No trips recorded yet.</div>';
+      return;
+    }
+    var html = '';
+    for(var i = 0; i < h.length; i++){
+      var t = h[i];
+      html += '<div class="history-item">' +
+        '<div class="history-item-top">' +
+          '<span class="history-date">' + formatTs(t.ts) + '</span>' +
+          '<span class="history-badge ' + (t.wentOver ? 'over' : 'ok') + '">' + (t.wentOver ? 'OVER' : 'OK') + '</span>' +
+        '</div>' +
+        '<div class="history-item-stats">' + t.distanceMi.toFixed(2) + ' mi · avg ' + t.avgMph + ' mph · limit ' + t.limitMph + ' mph</div>' +
+      '</div>';
+    }
+    els.historyList.innerHTML = html;
+  }
+
   function resetTrip(){
+    if(state.startTime != null){
+      var elapsedSec = (performance.now() - state.startTime) / 1000;
+      var distMiles = state.totalMeters * MILES_PER_METER;
+      if(elapsedSec >= 10 && distMiles >= 0.05){
+        var avgMph = elapsedSec > 0 ? (state.totalMeters / elapsedSec) * MPH_PER_MPS : 0;
+        logTrip({
+          ts: Date.now(),
+          distanceMi: Math.round(distMiles * 100) / 100,
+          avgMph: Math.round(avgMph),
+          limitMph: state.limitMph,
+          wentOver: state.tripWentOver
+        });
+      }
+    }
     state.totalMeters = 0;
     state.startTime = performance.now();
     state.lastFix = null;
+    state.tripWentOver = false;
     render(0, 0, 0);
     setState('safe', 'On the clock');
   }
@@ -351,40 +710,52 @@
     if(navigator.vibrate) navigator.vibrate([120, 60, 120]);
   }
 
+  function speak(text, cooldownMs, tag){
+    if(!state.voiceOn) return;
+    if(!('speechSynthesis' in window)) return;
+    var now = Date.now();
+    var last = state.lastVoice[tag] || 0;
+    if(now - last < cooldownMs) return;
+    state.lastVoice[tag] = now;
+    try{
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = 1.0;
+      u.volume = 1.0;
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+
   function limitInCurrentUnit(){
-    return state.limit;
+    return state.limitMph;
   }
 
   function renderCurrentSpeed(){
     var mps = state.currentSpeedMps || 0;
-    var val = state.unit === 'mph' ? mps * MPH_PER_MPS : mps * 3.6;
+    var val = mps * MPH_PER_MPS;
     els.curValue.textContent = val.toFixed(0);
-    els.curUnit.textContent = state.unit === 'mph' ? 'mph' : 'km/h';
-    var limitDisplay = limitInCurrentUnit();
+    var limitDisplay = state.limitMph;
     var ratio = limitDisplay > 0 ? val / limitDisplay : 0;
     var level = ratio >= 1 ? 'danger' : (ratio >= 0.92 ? 'warn' : 'safe');
     els.nowCircle.className = 'speed-circle now ' + level;
   }
 
   function render(avgSpeedMps, distMeters, elapsedSec){
-    var avgDisplay, distDisplay;
-    var limitDisplay = state.limit;
-    if(state.unit === 'mph'){
-      avgDisplay = avgSpeedMps * MPH_PER_MPS;
-      distDisplay = distMeters * MILES_PER_METER;
-      els.avgUnit.textContent = 'mph';
-      els.distUnit.textContent = 'miles';
-    } else {
-      avgDisplay = avgSpeedMps * 3.6;
-      distDisplay = distMeters * KM_PER_METER;
-      els.avgUnit.textContent = 'km/h';
-      els.distUnit.textContent = 'km';
-    }
+    var limitDisplay = state.limitMph;
+    var avgDisplay = avgSpeedMps * MPH_PER_MPS;
+    var distDisplay = distMeters * MILES_PER_METER;
 
     els.avgValue.textContent = avgDisplay.toFixed(0);
-    els.limitLine.textContent = 'limit ' + limitDisplay.toFixed(0) + ' ' + (state.unit === 'mph' ? 'mph' : 'km/h');
+    els.limitLine.textContent = 'limit ' + limitDisplay.toFixed(0) + ' mph';
     els.limitSignValue.textContent = limitDisplay.toFixed(0);
+    els.limitValue.textContent = limitDisplay.toFixed(0);
     els.distValue.textContent = distDisplay.toFixed(2);
+
+    if(state.limitMph === 70){
+      els.limitSignCircle.classList.add('nsl');
+    } else {
+      els.limitSignCircle.classList.remove('nsl');
+    }
 
     var mins = Math.floor(elapsedSec / 60);
     var secs = Math.floor(elapsedSec % 60);
@@ -396,8 +767,11 @@
     } else if(ratio >= 1){
       setState('danger', '⚠ OVER AVERAGE LIMIT — EASE OFF');
       beepAndBuzz();
+      speak('Over the average limit. Ease off.', 10000, 'danger');
+      state.tripWentOver = true;
     } else if(ratio >= 0.92){
       setState('warn', '⚠ Close to the limit');
+      speak('Approaching the average limit.', 20000, 'warn');
     } else {
       setState('safe', 'Under limit');
     }
@@ -437,6 +811,9 @@
     state.lastRawFix = { lat: c.latitude, lon: c.longitude, t: now };
 
     if(instSpeedMps !== null){
+      if(instSpeedMps < 0.9){
+        instSpeedMps = 0;
+      }
       state.currentSpeedMps = (state.currentSpeedMps == null)
         ? instSpeedMps
         : state.currentSpeedMps * 0.35 + instSpeedMps * 0.65;
@@ -478,42 +855,34 @@
   els.enableBtn.addEventListener('click', startGps);
   els.resetBtn.addEventListener('click', resetTrip);
 
-  els.limitDown.addEventListener('click', function(){
-    var minV = state.unit === 'mph' ? 10 : 15;
-    state.limit = Math.max(minV, state.limit - 5);
-    els.limitValue.textContent = state.limit;
-    tick();
-    renderCurrentSpeed();
-  });
-  els.limitUp.addEventListener('click', function(){
-    var maxV = state.unit === 'mph' ? 120 : 195;
-    state.limit = Math.min(maxV, state.limit + 5);
-    els.limitValue.textContent = state.limit;
-    tick();
-    renderCurrentSpeed();
+  els.presetBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      state.limitMph = parseInt(btn.getAttribute('data-mph'), 10);
+      els.presetBtns.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      tick();
+      renderCurrentSpeed();
+    });
   });
 
-  els.unitMph.addEventListener('click', function(){
-    if(state.unit !== 'mph'){
-      state.limit = Math.round(state.limit / 1.609344 / 5) * 5;
+  els.voiceToggle.addEventListener('click', function(){
+    state.voiceOn = !state.voiceOn;
+    els.voiceToggle.textContent = state.voiceOn ? '🔊' : '🔇';
+    if(!state.voiceOn && 'speechSynthesis' in window){
+      window.speechSynthesis.cancel();
     }
-    state.unit = 'mph';
-    els.unitMph.classList.add('active');
-    els.unitKph.classList.remove('active');
-    els.limitValue.textContent = state.limit;
-    tick();
-    renderCurrentSpeed();
   });
-  els.unitKph.addEventListener('click', function(){
-    if(state.unit !== 'kph'){
-      state.limit = Math.round(state.limit * 1.609344 / 5) * 5;
-    }
-    state.unit = 'kph';
-    els.unitKph.classList.add('active');
-    els.unitMph.classList.remove('active');
-    els.limitValue.textContent = state.limit;
-    tick();
-    renderCurrentSpeed();
+
+  els.historyBtn.addEventListener('click', function(){
+    renderHistory();
+    els.historyOverlay.classList.remove('hidden');
+  });
+  els.historyClose.addEventListener('click', function(){
+    els.historyOverlay.classList.add('hidden');
+  });
+  els.historyClear.addEventListener('click', function(){
+    saveHistory([]);
+    renderHistory();
   });
 })();
 </script>
