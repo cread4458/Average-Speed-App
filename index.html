@@ -310,6 +310,39 @@
     flex-shrink: 0;
   }
 
+  .session-controls{
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .session-btn{
+    flex: 1;
+    padding: 14px 0;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    background: var(--bg-panel);
+    color: var(--text-primary);
+  }
+
+  .session-btn.play-btn{
+    background: var(--safe);
+    color: #06130d;
+    border-color: var(--safe);
+  }
+
+  .session-btn:disabled{
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .session-btn:active:not(:disabled){ transform: scale(0.97); }
+
   .reset-btn{
     width: 100%;
     height: 76px;
@@ -545,6 +578,10 @@
     <div class="accuracy-note" id="accuracyNote"></div>
 
     <div class="controls">
+      <div class="session-controls">
+        <button class="session-btn play-btn" id="playBtn">▶ PLAY</button>
+        <button class="session-btn stop-btn" id="stopBtn">■ STOP</button>
+      </div>
       <button class="reset-btn" id="resetBtn">RESET</button>
     </div>
   </div>
@@ -572,6 +609,7 @@
     voiceOn: true,
     tripWentOver: false,
     currentSpeedMps: 0,
+    phase: 'idle',           // 'idle' | 'running' | 'stopped'
   };
 
   var els = {
@@ -601,6 +639,8 @@
     gpsAccuracy: document.getElementById('gpsAccuracy'),
     accuracyNote: document.getElementById('accuracyNote'),
     resetBtn: document.getElementById('resetBtn'),
+    playBtn: document.getElementById('playBtn'),
+    stopBtn: document.getElementById('stopBtn'),
   };
 
   var MPH_PER_MPS = 2.236936;
@@ -664,27 +704,60 @@
     els.historyList.innerHTML = html;
   }
 
-  function resetTrip(){
-    if(state.startTime != null){
-      var elapsedSec = (performance.now() - state.startTime) / 1000;
-      var distMiles = state.totalMeters * MILES_PER_METER;
-      if(elapsedSec >= 10 && distMiles >= 0.05){
-        var avgMph = elapsedSec > 0 ? (state.totalMeters / elapsedSec) * MPH_PER_MPS : 0;
-        logTrip({
-          ts: Date.now(),
-          distanceMi: Math.round(distMiles * 100) / 100,
-          avgMph: Math.round(avgMph),
-          limitMph: state.limitMph,
-          wentOver: state.tripWentOver
-        });
-      }
-    }
+  function updateControlButtons(){
+    var running = state.phase === 'running';
+    els.playBtn.disabled = running;
+    els.stopBtn.disabled = !running;
+  }
+
+  function playTrip(){
+    if(state.phase === 'running') return;
     state.totalMeters = 0;
-    state.startTime = performance.now();
     state.lastFix = null;
     state.tripWentOver = false;
+    state.startTime = performance.now();
+    state.phase = 'running';
     render(0, 0, 0);
     setState('safe', 'On the clock');
+    updateControlButtons();
+  }
+
+  function stopTrip(){
+    if(state.phase !== 'running') return;
+    var elapsedSec = state.startTime != null ? (performance.now() - state.startTime) / 1000 : 0;
+    var distMiles = state.totalMeters * MILES_PER_METER;
+    var saved = false;
+    if(elapsedSec >= 10 && distMiles >= 0.05){
+      var avgMph = elapsedSec > 0 ? (state.totalMeters / elapsedSec) * MPH_PER_MPS : 0;
+      logTrip({
+        ts: Date.now(),
+        distanceMi: Math.round(distMiles * 100) / 100,
+        avgMph: Math.round(avgMph),
+        limitMph: state.limitMph,
+        wentOver: state.tripWentOver
+      });
+      saved = true;
+    }
+    state.phase = 'stopped';
+    setState('safe', saved ? 'Trip stopped — saved to history' : 'Trip stopped — too short to save');
+    updateControlButtons();
+  }
+
+  function resetCounters(){
+    state.totalMeters = 0;
+    state.lastFix = null;
+    state.tripWentOver = false;
+    if(state.phase === 'running'){
+      state.startTime = performance.now();
+      render(0, 0, 0);
+      setState('safe', 'On the clock');
+    } else {
+      state.phase = 'idle';
+      state.startTime = null;
+      render(0, 0, 0);
+      setState('safe', 'Ready — tap Play to start');
+    }
+    updateControlButtons();
   }
 
   function setState(level, msg){
@@ -774,7 +847,7 @@
   }
 
   function tick(){
-    if(state.startTime == null) return;
+    if(state.phase !== 'running' || state.startTime == null) return;
     var elapsedSec = (performance.now() - state.startTime) / 1000;
     var avgSpeed = elapsedSec > 0 ? state.totalMeters / elapsedSec : 0;
     render(avgSpeed, state.totalMeters, elapsedSec);
@@ -818,13 +891,13 @@
       }
     }
 
-    if(state.lastFix && c.accuracy && c.accuracy <= 40){
+    if(state.phase === 'running' && state.lastFix && c.accuracy && c.accuracy <= 40){
       var d = haversineMeters(state.lastFix.lat, state.lastFix.lon, c.latitude, c.longitude);
       if(d > 1.5){
         state.totalMeters += d;
       }
     }
-    if(!c.accuracy || c.accuracy <= 40){
+    if(state.phase === 'running' && (!c.accuracy || c.accuracy <= 40)){
       state.lastFix = { lat: c.latitude, lon: c.longitude, t: now };
     }
     tick();
@@ -841,7 +914,13 @@
     }
     els.gpsGate.classList.add('hidden');
     els.appBody.classList.remove('hidden');
-    resetTrip();
+    state.phase = 'running';
+    state.totalMeters = 0;
+    state.startTime = performance.now();
+    state.tripWentOver = false;
+    render(0, 0, 0);
+    setState('safe', 'On the clock');
+    updateControlButtons();
     state.watchId = navigator.geolocation.watchPosition(onPosition, onPositionError, {
       enableHighAccuracy: true,
       maximumAge: 1000,
@@ -852,11 +931,19 @@
 
   els.enableBtn.addEventListener('click', startGps);
   els.resetBtn.addEventListener('click', function(){
-    resetTrip();
+    resetCounters();
     els.resetBtn.classList.remove('pressed');
-    void els.resetBtn.offsetWidth;
+    void els.resetBtn.offsetWidth; // restart animation if tapped again quickly
     els.resetBtn.classList.add('pressed');
     if(navigator.vibrate) navigator.vibrate(40);
+  });
+  els.playBtn.addEventListener('click', function(){
+    playTrip();
+    if(navigator.vibrate) navigator.vibrate(30);
+  });
+  els.stopBtn.addEventListener('click', function(){
+    stopTrip();
+    if(navigator.vibrate) navigator.vibrate(30);
   });
 
   els.presetBtns.forEach(function(btn){
