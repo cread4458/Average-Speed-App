@@ -120,6 +120,9 @@
   }
 
   .icon-btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     background: var(--bg-panel);
     border: 1px solid var(--border);
     border-radius: 10px;
@@ -205,6 +208,11 @@
     font-size: min(12vw, 54px);
     font-weight: 700;
     color: var(--text-primary);
+    transition: color 0.2s ease;
+  }
+
+  .speed-circle.now.danger .circle-value{
+    color: var(--danger);
   }
 
   .speed-circle.now .circle-unit{
@@ -232,22 +240,6 @@
     font-size: min(14vw, 62px);
     font-weight: 800;
     color: #16181a;
-  }
-
-  /* National Speed Limit sign: white circle, black diagonal band, no number */
-  .speed-circle.limit-sign.nsl{
-    border-color: #16181a;
-    border-width: 4px;
-    background: linear-gradient(135deg,
-      transparent calc(50% - 9px),
-      #16181a calc(50% - 9px),
-      #16181a calc(50% + 9px),
-      transparent calc(50% + 9px)
-    ), #ffffff;
-  }
-
-  .speed-circle.limit-sign.nsl .sign-value{
-    display: none;
   }
 
   .readout-label{
@@ -333,6 +325,15 @@
   }
 
   .reset-btn:active{ transform: scale(0.98); }
+
+  .reset-btn.pressed{
+    animation: resetPress 0.4s ease;
+  }
+
+  @keyframes resetPress{
+    0%{ transform: scale(0.95); filter: brightness(1.5); }
+    100%{ transform: scale(1); filter: brightness(1); }
+  }
 
   .gps-gate{
     flex: 1;
@@ -481,7 +482,7 @@
       <span class="limit-value-unit">mph</span>
     </div>
     <div class="topbar-actions">
-      <button class="icon-btn" id="voiceToggle" aria-label="Toggle voice alerts">🔊</button>
+      <button class="icon-btn" id="voiceToggle" aria-label="Toggle voice alerts"><svg id="voiceIcon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 6.5a8 8 0 0 1 0 11"/></svg></button>
       <button class="icon-btn" id="historyBtn" aria-label="Trip history">History</button>
     </div>
   </div>
@@ -588,6 +589,7 @@
     limitValue: document.getElementById('limitValue'),
     presetBtns: document.querySelectorAll('.preset-btn'),
     voiceToggle: document.getElementById('voiceToggle'),
+    voiceIcon: document.getElementById('voiceIcon'),
     historyBtn: document.getElementById('historyBtn'),
     historyOverlay: document.getElementById('historyOverlay'),
     historyClose: document.getElementById('historyClose'),
@@ -751,12 +753,6 @@
     els.limitValue.textContent = limitDisplay.toFixed(0);
     els.distValue.textContent = distDisplay.toFixed(2);
 
-    if(state.limitMph === 70){
-      els.limitSignCircle.classList.add('nsl');
-    } else {
-      els.limitSignCircle.classList.remove('nsl');
-    }
-
     var mins = Math.floor(elapsedSec / 60);
     var secs = Math.floor(elapsedSec % 60);
     els.timeValue.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
@@ -796,9 +792,10 @@
 
     var now = performance.now();
 
-    var instSpeedMps = (typeof c.speed === 'number' && c.speed >= 0 && isFinite(c.speed)) ? c.speed : null;
+    var goodFix = c.accuracy && c.accuracy <= 20;
+    var instSpeedMps = (goodFix && typeof c.speed === 'number' && c.speed >= 0 && isFinite(c.speed)) ? c.speed : null;
 
-    if(instSpeedMps === null && state.lastRawFix && c.accuracy && c.accuracy <= 30){
+    if(instSpeedMps === null && goodFix && state.lastRawFix){
       var dtRaw = (now - state.lastRawFix.t) / 1000;
       if(dtRaw > 0.25){
         var dRaw = haversineMeters(state.lastRawFix.lat, state.lastRawFix.lon, c.latitude, c.longitude);
@@ -814,10 +811,11 @@
       if(instSpeedMps < 0.9){
         instSpeedMps = 0;
       }
-      state.currentSpeedMps = (state.currentSpeedMps == null)
-        ? instSpeedMps
-        : state.currentSpeedMps * 0.35 + instSpeedMps * 0.65;
-      renderCurrentSpeed();
+      var prevSpeed = state.currentSpeedMps || 0;
+      if(Math.abs(instSpeedMps - prevSpeed) <= 13){
+        state.currentSpeedMps = prevSpeed * 0.35 + instSpeedMps * 0.65;
+        renderCurrentSpeed();
+      }
     }
 
     if(state.lastFix && c.accuracy && c.accuracy <= 40){
@@ -853,7 +851,13 @@
   }
 
   els.enableBtn.addEventListener('click', startGps);
-  els.resetBtn.addEventListener('click', resetTrip);
+  els.resetBtn.addEventListener('click', function(){
+    resetTrip();
+    els.resetBtn.classList.remove('pressed');
+    void els.resetBtn.offsetWidth;
+    els.resetBtn.classList.add('pressed');
+    if(navigator.vibrate) navigator.vibrate(40);
+  });
 
   els.presetBtns.forEach(function(btn){
     btn.addEventListener('click', function(){
@@ -865,9 +869,12 @@
     });
   });
 
+  var VOICE_ICON_ON = '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 6.5a8 8 0 0 1 0 11"/>';
+  var VOICE_ICON_OFF = '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9a4 4 0 0 1 0 6" opacity="0.35"/><path d="M18.5 6.5a8 8 0 0 1 0 11" opacity="0.35"/><line x1="2.5" y1="2.5" x2="21.5" y2="21.5"/>';
+
   els.voiceToggle.addEventListener('click', function(){
     state.voiceOn = !state.voiceOn;
-    els.voiceToggle.textContent = state.voiceOn ? '🔊' : '🔇';
+    els.voiceIcon.innerHTML = state.voiceOn ? VOICE_ICON_ON : VOICE_ICON_OFF;
     if(!state.voiceOn && 'speechSynthesis' in window){
       window.speechSynthesis.cancel();
     }
